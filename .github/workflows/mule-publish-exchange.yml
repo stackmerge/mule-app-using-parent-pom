@@ -25,11 +25,11 @@ jobs:
         git config user.email "stackmerge@gmail.com"
         git config user.name "stackmerge"
         git config pull.rebase false
-        git checkout dev
+        git checkout main
         mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit -s settings.xml --file pom.xml
         git add pom.xml
         git commit -m "[skip ci] version updated."
-        git push origin dev  
+        git push origin main  
         
     - name: Publish to Exchange    
-      run: mvn deploy --file pom.xml -s settings.xml -DskipTests
+      run: mvn -B -ntp deploy -s settings.xml -DskipTests
