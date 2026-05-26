@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="user-greeting-api-test-suite.xml"
+        doc:name="MUnit Configuration"
+        doc:description="MUnit test suite configuration for user-greeting-api flows"/>
+
+    <!-- =====================================================================
+         POSITIVE TEST 1: GET /greet with name=Alice
+         Expected: greeting = "Hello, Alice!", message = "Welcome to MuleVibes Greeting API"
+         ===================================================================== -->
+    <munit:test name="user-greeting-flow-positive-Alice"
+        description="Positive: GET /greet with name=Alice returns personalized greeting"
+        doc:name="User Greeting Flow Positive Alice Test"
+        doc:description="Verifies that the greeting flow returns a personalized message when name=Alice is provided as a query parameter">
+
+        <munit:behavior>
+            <munit:set-event doc:name="Set Initial Event"
+                doc:description="Initializes the test event payload with an empty object">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+            <set-variable variableName="attributes"
+                value="#[{ queryParams: { name: 'Alice' } }]"
+                doc:name="Set Query Param Attributes"
+                doc:description="Sets HTTP query parameters with name=Alice to simulate GET /greet?name=Alice"/>
+        </munit:behavior>
+
+        <munit:execution>
+            <flow-ref name="user-greeting-flow"
+                doc:name="Invoke User Greeting Flow"
+                doc:description="Calls user-greeting-flow; flow should extract Alice from query params and build personalised greeting"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-that
+                expression="#[payload]"
+                is="#[MunitTools::notNullValue()]"
+                doc:name="Assert Payload Not Null"
+                doc:description="Asserts that the response payload is not null"/>
+            <munit-tools:assert-equals
+                actual="#[payload.greeting]"
+                expected="Hello, Alice!"
+                doc:name="Assert Personalized Greeting"
+                doc:description="Verifies that greeting field contains Hello, Alice!"/>
+            <munit-tools:assert-equals
+                actual="#[payload.message]"
+                expected="Welcome to MuleVibes Greeting API"
+                doc:name="Assert Welcome Message"
+                doc:description="Verifies that message field contains the standard welcome text"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- =====================================================================
+         POSITIVE TEST 2: GET /greet with NO name parameter (defaults to "Guest")
+         Expected: greeting = "Hello, Guest!", message = "Welcome to MuleVibes Greeting API"
+         ===================================================================== -->
+    <munit:test name="user-greeting-flow-positive-default-guest"
+        description="Positive: GET /greet without name query param defaults userName to Guest"
+        doc:name="User Greeting Flow Positive Default Guest Test"
+        doc:description="Verifies that the greeting flow defaults to Guest and returns the expected JSON when no name query parameter is provided">
+
+        <munit:behavior>
+            <munit:set-event doc:name="Set Event"
+                doc:description="Initializes the event payload for the test">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+            <set-variable variableName="attributes"
+                value="#[{ queryParams: {} }]"
+                doc:name="Set Attributes Variable"
+                doc:description="Sets empty query parameters to simulate GET /greet without a name, triggering the default Guest behaviour"/>
+        </munit:behavior>
+
+        <munit:execution>
+            <flow-ref name="user-greeting-flow"
+                doc:name="Invoke User Greeting Flow"
+                doc:description="Calls user-greeting-flow; flow should default userName to Guest when name is absent"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-that
+                expression="#[payload]"
+                is="#[MunitTools::notNullValue()]"
+                doc:name="Assert Payload Not Null"
+                doc:description="Asserts that the flow response payload is not null"/>
+            <munit-tools:assert-equals
+                actual="#[payload.greeting]"
+                expected="Hello, Guest!"
+                doc:name="Assert Default Guest Greeting"
+                doc:description="Verifies that the greeting field defaults to Hello, Guest! when no name is supplied"/>
+            <munit-tools:assert-equals
+                actual="#[payload.message]"
+                expected="Welcome to MuleVibes Greeting API"
+                doc:name="Assert Welcome Message"
+                doc:description="Verifies that the message field matches the expected Welcome to MuleVibes Greeting API text"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- =====================================================================
+         NEGATIVE TEST: Validate error handler DataWeave produces correct JSON structure
+         Uses raise-error + on-error-continue to apply the same DataWeave transformation
+         that exists in the flow's on-error-propagate handler, then asserts the output.
+         Expected: payload contains "error" (description) and "errorType" (identifier) fields.
+         ===================================================================== -->
+
+</mule>

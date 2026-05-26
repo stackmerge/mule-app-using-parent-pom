@@ -1,0 +1,74 @@
+{
+  "basicConstraints": 88,
+  "criticalExtensionOIDs": [
+    "risus",
+    "adipiscing"
+  ],
+  "extendedKeyUsage": [
+    "Lorem",
+    "tempor"
+  ],
+  "extensions": [
+    {
+      "criticality": false,
+      "oid": "nunc"
+    }
+  ],
+  "issuerAlternativeNames": [
+    {
+      "name": "Agatha",
+      "type": 72
+    }
+  ],
+  "issuerDN": {
+    "commonName": "In",
+    "name": "Andi"
+  },
+  "issuerUniqueID": [
+    true,
+    false,
+    true
+  ],
+  "issuerX500Principal": {
+    "name": "Aleida"
+  },
+  "keyUsage": [
+    false,
+    false
+  ],
+  "name": "Alethea",
+  "nonCriticalExtensionOIDs": [
+    "Aliquam",
+    "tempor",
+    "pretium"
+  ],
+  "notAfter": "2024-01-20",
+  "notBefore": "2021-12-27",
+  "publicKey": {
+    "algorithm": "tincidunt",
+    "modulus": 64,
+    "params": 68,
+    "publicKey": "adipiscing"
+  },
+  "serialNumber": 58,
+  "serialNumberObject": {
+    "serialNumber": 92
+  },
+  "sigAlgName": "ipsum",
+  "sigAlgOID": "aliquam",
+  "subjectAlternativeNames": [
+    {
+      "name": "Alejandra",
+      "type": 97
+    }
+  ],
+  "subjectDN": {
+    "commonName": "sed",
+    "name": "Ami"
+  },
+  "subjectX500Principal": {
+    "name": "Adolph"
+  },
+  "type": "erat",
+  "version": 42
+}
