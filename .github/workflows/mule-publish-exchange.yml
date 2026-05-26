@@ -1,0 +1,35 @@
+name: Publish to Exchange
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      CONNECTEDAPP_CLIENT_ID: ${{ secrets.CONNECTEDAPP_CLIENT_ID }}
+      CONNECTEDAPP_CLIENT_SECRET: ${{ secrets.CONNECTEDAPP_CLIENT_SECRET }}    
+      
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Updating POM Version   
+      run: |
+        git config user.email "stackmerge@gmail.com"
+        git config user.name "stackmerge"
+        git config pull.rebase false
+        git checkout dev
+        mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit -s settings.xml --file pom.xml
+        git add pom.xml
+        git commit -m "[skip ci] version updated."
+        git push origin dev  
+        
+    - name: Publish to Exchange    
+      run: mvn deploy --file pom.xml -s settings.xml -DskipTests
